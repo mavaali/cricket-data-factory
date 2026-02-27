@@ -151,33 +151,15 @@ These affect all analytics calculations:
 
 ## Workspace Configuration
 
-- **Workspace**: Cricket Data Factory
-- **Workspace ID**: `4995b8e1-65cc-46f6-b456-644a46e082d5`
-- **Lakehouse**: CricketLakehouse
-- **Lakehouse ID**: `3c76307d-170f-423b-abfc-5b52e5f01e5e`
-- **Notebook**: CricketETL (`8afec919-e692-4099-adc0-a019fa0d581f`)
-- **Portal base URL**: `https://msit.powerbi.com` (MSIT tenant)
-- **Notebook portal URL**: `https://msit.powerbi.com/groups/4995b8e1-65cc-46f6-b456-644a46e082d5/synapsenotebooks/8afec919-e692-4099-adc0-a019fa0d581f`
-- **Workspace portal URL**: `https://msit.powerbi.com/groups/4995b8e1-65cc-46f6-b456-644a46e082d5`
-- **SQL Endpoint**: `x6eps4xrq2xudenlfv6naeo3i4-4g4jksommx3enncwmrfenyec2u.msit-datawarehouse.fabric.microsoft.com`
-- **SQL Endpoint ID**: `de25306a-4f93-4284-9cb6-147bc4e5c7ef`
-- **Semantic Model**: CricketAnalytics (`c4996ee5-8226-4afa-b895-f9d0a1feffe8`)
+Configure these for your own Fabric tenant:
 
-## Session Context (Feb 26, 2026)
+- **Workspace**: name of your Fabric workspace
+- **Lakehouse**: CricketLakehouse (created via Fabric MCP `onelake item create`)
+- **Notebook**: CricketETL (deployed via REST API `updateDefinition`)
+- **Semantic Model**: CricketAnalytics (DirectLake over lakehouse tables)
 
-### What was built in this session
-1. Created CricketLakehouse via Fabric MCP `onelake item create`
-2. Built PySpark ETL notebook (`notebooks/CricketETL.py`) — downloads 94MB Cricsheet ZIP, parses 21K JSON files, writes 4 Delta tables
-3. Deployed notebook via Fabric REST API `updateDefinition` (base64 ipynb)
-4. Executed ETL via Fabric Livy API (`scripts/run_livy.py`) — all cells succeeded, 10.9M deliveries loaded
-5. Created PlayerEnrichment dataflow via DataFactory MCP (v4 — needed fresh dataflow + AllowCombine + correct CSV columns)
-6. Created CricketPipeline via Fabric REST API (Notebook → Dataflow)
-7. Deployed CricketAnalytics DirectLake semantic model via REST API (model.bim + definition.pbism)
-8. Added OneLake backend to cricket-mcp (`src/backends/onelake.ts`) — DuckDB delta+azure extensions reading from OneLake
-9. cricket-mcp confirmed working on OneLake — all 26 tools operational
-10. Pushed to https://github.com/mavaali/cricket-data-factory
+## Key Learnings
 
-### Key learnings encoded
 - **Fabric Jobs API** returns "failed without detail error" — always use **Livy API** for notebook execution
 - **DataFactory MCP NuGet version**: use `Microsoft.DataFactory.MCP@0.16.0-beta` (not `latest`)
 - **DataFactory MCP feature flags**: `--pipeline` and `--dataflow-query` enable pipeline and query tools
@@ -185,18 +167,10 @@ These affect all analytics calculations:
 - **Player CSV columns**: `cricinfo_id` (NOT `espn_id`), `cricsheet_id`, `unique_name`, `full_name`, `name`, `country`, `dob`, `batting_style`, `bowling_style`, `birthplace`, `playing_role`
 - **DirectLake model.bim**: needs `definition.pbism` alongside, `compatibilityLevel: 1604`, `expressionSource` referencing `Sql.Database()` expression
 - **Power BI Modeling MCP on macOS**: needs `codesign -s -` to ad-hoc sign the unsigned binary
-- **Architecture diagram in README** still shows 4 boxes — needs updating to 6
-
-### Remaining TODO
-- Git commit/push OneLake backend changes to cricket-mcp repo
-- Switch gh auth back to mihirwagleMSFT after pushing
-- Run `enrich` cell via Livy after PlayerEnrichment dataflow to populate players table
 
 ## Livy Session (for interactive Spark execution)
 
-- **Session ID**: `166a28f2-821c-4e5c-a39a-62ba5b5a2feb` (may need to recreate if expired)
 - **Livy API base**: `https://api.fabric.microsoft.com/v1/workspaces/{WS}/lakehouses/{LH}/livyApi/versions/2023-12-01/sessions/{SESSION}`
-- **Session created on**: CricketLakehouse (tables accessible via `saveAsTable()`)
 - **Script**: `scripts/run_livy.py` — submits cells from `notebooks/CricketETL.py` to the Livy session
 - **Cell names**: imports, download, parse, players, matches, innings, deliveries, optimize, validate, enrich, cleanup
 
@@ -207,7 +181,7 @@ The Fabric Jobs API (`/jobs/instances?jobType=RunNotebook`) returns "Job instanc
 ### Creating a new Livy session
 ```bash
 TOKEN=$(az account get-access-token --resource https://api.fabric.microsoft.com --query accessToken -o tsv)
-curl -s -X POST "https://api.fabric.microsoft.com/v1/workspaces/4995b8e1-65cc-46f6-b456-644a46e082d5/lakehouses/3c76307d-170f-423b-abfc-5b52e5f01e5e/livyApi/versions/2023-12-01/sessions" \
+curl -s -X POST "https://api.fabric.microsoft.com/v1/workspaces/{WORKSPACE_ID}/lakehouses/{LAKEHOUSE_ID}/livyApi/versions/2023-12-01/sessions" \
   -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{}'
 ```
 
@@ -222,7 +196,3 @@ The `player_meta.csv` has these columns (verified from actual file):
 - `country`, `dob`, `batting_style`, `bowling_style`, `birthplace`, `playing_role`
 
 Join key: `player_enrichment.cricsheet_id = players.player_id`
-
-**Dataflow connection IDs:**
-- Web (GitHub): `50d52de4-c0a3-48da-8afb-97fe5fca946b`
-- Lakehouse: `97b68bdf-bb1b-44bc-8aa4-f7b1619df35b`
