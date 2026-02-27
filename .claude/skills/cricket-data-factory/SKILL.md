@@ -188,10 +188,9 @@ These affect all analytics calculations:
 - **Architecture diagram in README** still shows 4 boxes — needs updating to 6
 
 ### Remaining TODO
-- Update ASCII architecture diagram in README to show all 6 MCP servers
-- Merge player_enrichment into players table (cricket-mcp `get_style_matchup` needs enrichment on players table directly)
 - Git commit/push OneLake backend changes to cricket-mcp repo
 - Switch gh auth back to mihirwagleMSFT after pushing
+- Run `enrich` cell via Livy after PlayerEnrichment dataflow to populate players table
 
 ## Livy Session (for interactive Spark execution)
 
@@ -199,7 +198,7 @@ These affect all analytics calculations:
 - **Livy API base**: `https://api.fabric.microsoft.com/v1/workspaces/{WS}/lakehouses/{LH}/livyApi/versions/2023-12-01/sessions/{SESSION}`
 - **Session created on**: CricketLakehouse (tables accessible via `saveAsTable()`)
 - **Script**: `scripts/run_livy.py` — submits cells from `notebooks/CricketETL.py` to the Livy session
-- **Cell names**: imports, download, parse, players, matches, innings, deliveries, optimize, validate, cleanup
+- **Cell names**: imports, download, parse, players, matches, innings, deliveries, optimize, validate, enrich, cleanup
 
 ### Why Livy over Jobs API
 

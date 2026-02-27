@@ -13,30 +13,30 @@ Inspired by [From JSON to GOAT](https://tpeplow.substack.com/p/from-json-to-goat
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        VS Code + Copilot                             │
-│                                                                       │
-│  ┌──────────────┐  ┌──────────────┐  ┌───────────┐  ┌─────────────┐ │
-│  │ Fabric MCP   │  │ DataFactory  │  │ Power BI  │  │ cricket-mcp │ │
-│  │ Server       │  │ MCP          │  │ MCP       │  │             │ │
-│  │              │  │              │  │           │  │             │ │
-│  │ • Create     │  │ • Dataflows  │  │ • TMDL    │  │ • 26 query  │ │
-│  │   lakehouse  │  │ • Pipelines  │  │ • DAX     │  │   tools     │ │
-│  │ • Upload     │  │ • M code     │  │ • Semantic │  │ • Matchups  │ │
-│  │   files      │  │ • Connections│  │   model   │  │ • Stats     │ │
-│  │ • Inspect    │  │ • Refresh    │  │           │  │ • Records   │ │
-│  │   tables     │  │              │  │           │  │             │ │
-│  │ • Best       │  │              │  │           │  │             │ │
-│  │   practices  │  │              │  │           │  │             │ │
-│  └──────┬───────┘  └──────┬───────┘  └─────┬─────┘  └──────┬──────┘ │
-│         │                 │                │               │        │
-└─────────┼─────────────────┼────────────────┼───────────────┼────────┘
-          │                 │                │               │
-          ▼                 ▼                ▼               ▼
-    ┌─────────────────────────────────────────────────────────────┐
-    │              OneLake (CricketLakehouse)                      │
-    │  players | matches | innings | deliveries | player_enrichment│
-    └─────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                    VS Code + Copilot                                          │
+│                                                                                                │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌───────────┐ ┌───────────┐ │
+│  │ Fabric MCP  │ │ Fabric      │ │ DataFactory │ │ Power BI    │ │ Power BI  │ │ cricket-  │ │
+│  │ Server      │ │ Analytics   │ │ MCP         │ │ Modeling    │ │ MCP       │ │ mcp       │ │
+│  │             │ │ MCP         │ │             │ │ MCP         │ │           │ │           │ │
+│  │ • Create    │ │ • Create    │ │ • Dataflows │ │ • Tables    │ │ • DAX     │ │ • 26 query│ │
+│  │   lakehouse │ │   notebooks │ │ • Pipelines │ │ • Measures  │ │   queries │ │   tools   │ │
+│  │ • Upload    │ │ • Execute   │ │ • M code    │ │ • Relations │ │ • Semantic │ │ • Matchups│ │
+│  │   files     │ │   notebooks │ │ • Connect-  │ │ • TMDL      │ │   model   │ │ • Stats   │ │
+│  │ • Inspect   │ │ • Livy      │ │   ions      │ │   import/   │ │   schema  │ │ • Records │ │
+│  │   tables    │ │   sessions  │ │ • Refresh   │ │   export    │ │ • Natural │ │ • Career  │ │
+│  │ • Best      │ │ • Monitor   │ │             │ │ • Deploy to │ │   language│ │   trends  │ │
+│  │   practices │ │   Spark     │ │             │ │   Fabric    │ │           │ │           │ │
+│  └──────┬──────┘ └──────┬──────┘ └──────┬──────┘ └──────┬──────┘ └─────┬─────┘ └─────┬─────┘ │
+│         │               │               │               │              │             │       │
+└─────────┼───────────────┼───────────────┼───────────────┼──────────────┼─────────────┼───────┘
+          │               │               │               │              │             │
+          ▼               ▼               ▼               ▼              ▼             ▼
+    ┌──────────────────────────────────────────────────────────────────────────────────────┐
+    │                            OneLake (CricketLakehouse)                                 │
+    │         players | matches | innings | deliveries | player_enrichment                   │
+    └──────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 **Key design decision:** The Power BI semantic model IS the star schema — no physical dimension tables needed. Relationships and DAX measures are defined in TMDL on top of the 4-table schema. This means cricket-mcp's 26 SQL tools work unchanged against the same data Power BI uses.
@@ -133,6 +133,7 @@ python3 scripts/run_livy.py innings     # Write innings table
 python3 scripts/run_livy.py deliveries  # Write 10.9M row deliveries table
 python3 scripts/run_livy.py optimize    # OPTIMIZE with V-Order
 python3 scripts/run_livy.py validate    # Validation queries
+python3 scripts/run_livy.py enrich      # Merge player_enrichment → players
 ```
 
 The notebook ([`notebooks/CricketETL.py`](notebooks/CricketETL.py)) downloads [Cricsheet](https://cricsheet.org/) data and writes cricket-mcp's native 4-table schema as Delta tables:

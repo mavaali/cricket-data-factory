@@ -467,6 +467,62 @@ spark.sql("""
 
 # CELL ********************
 
+# MARKDOWN ********************
+
+# ## Step 6: Merge player enrichment into players table
+#
+# The PlayerEnrichment dataflow (DataFactory MCP) writes a separate `player_enrichment`
+# table with batting_style, bowling_style, playing_role, and country from ESPNCricinfo.
+#
+# This step merges that data into the `players` table so cricket-mcp tools like
+# `get_style_matchup` can query enrichment columns directly on the players table.
+#
+# Join key: `player_enrichment.cricsheet_id = players.player_id`
+
+# CELL ********************
+
+# Merge player_enrichment into players table
+# Only runs if player_enrichment table exists (created by PlayerEnrichment dataflow)
+try:
+    enrichment_df = spark.table("player_enrichment")
+    enrichment_count = enrichment_df.count()
+    print(f"Found player_enrichment table: {enrichment_count:,} rows")
+
+    # Read current players table
+    players_current = spark.table("players")
+    players_count = players_current.count()
+    print(f"Current players table: {players_count:,} rows")
+
+    # Left join players with enrichment on cricsheet_id = player_id
+    # Use enrichment values where available, keep NULLs where not
+    merged_df = players_current.alias("p").join(
+        enrichment_df.alias("e"),
+        F.col("p.player_id") == F.col("e.cricsheet_id"),
+        "left"
+    ).select(
+        F.col("p.player_id"),
+        F.col("p.player_name"),
+        F.coalesce(F.col("e.batting_style"), F.col("p.batting_style")).alias("batting_style"),
+        F.coalesce(F.col("e.bowling_style"), F.col("p.bowling_style")).alias("bowling_style"),
+        F.coalesce(F.col("e.playing_role"), F.col("p.playing_role")).alias("playing_role"),
+        F.coalesce(F.col("e.country"), F.col("p.country")).alias("country"),
+    )
+
+    # Overwrite players table with enriched data
+    merged_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("players")
+
+    # Report enrichment stats
+    enriched_count = merged_df.filter(F.col("batting_style").isNotNull()).count()
+    print(f"✓ players table updated: {merged_df.count():,} rows ({enriched_count:,} with enrichment data)")
+
+except Exception as e:
+    if "Table or view not found" in str(e) or "is not a Delta table" in str(e):
+        print("⏭ player_enrichment table not found — skipping merge (run PlayerEnrichment dataflow first)")
+    else:
+        raise e
+
+# CELL ********************
+
 # Clean up temp files
 import shutil
 shutil.rmtree(tmp_dir, ignore_errors=True)

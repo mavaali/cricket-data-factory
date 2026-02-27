@@ -75,7 +75,8 @@ if __name__ == "__main__":
         "deliveries": 7,   # Write deliveries
         "optimize": 8,     # OPTIMIZE
         "validate": 9,     # Validation queries
-        "cleanup": 10,     # Clean up
+        "enrich": 10,      # Merge player_enrichment into players
+        "cleanup": 11,     # Clean up
     }
     
     if cell_name == "list":
