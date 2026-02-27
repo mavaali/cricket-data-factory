@@ -14,15 +14,15 @@ Inspired by [From JSON to GOAT](https://tpeplow.substack.com/p/from-json-to-goat
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                    VS Code + Copilot                                          │
-│                                                                                                │
+│                                    VS Code + Copilot                                         │
+│                                                                                              │
 │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌───────────┐ ┌───────────┐ │
 │  │ Fabric MCP  │ │ Fabric      │ │ DataFactory │ │ Power BI    │ │ Power BI  │ │ cricket-  │ │
 │  │ Server      │ │ Analytics   │ │ MCP         │ │ Modeling    │ │ MCP       │ │ mcp       │ │
 │  │             │ │ MCP         │ │             │ │ MCP         │ │           │ │           │ │
 │  │ • Create    │ │ • Create    │ │ • Dataflows │ │ • Tables    │ │ • DAX     │ │ • 26 query│ │
 │  │   lakehouse │ │   notebooks │ │ • Pipelines │ │ • Measures  │ │   queries │ │   tools   │ │
-│  │ • Upload    │ │ • Execute   │ │ • M code    │ │ • Relations │ │ • Semantic │ │ • Matchups│ │
+│  │ • Upload    │ │ • Execute   │ │ • M code    │ │ • Relations │ │ • Semantic│ │ • Matchups│ │
 │  │   files     │ │   notebooks │ │ • Connect-  │ │ • TMDL      │ │   model   │ │ • Stats   │ │
 │  │ • Inspect   │ │ • Livy      │ │   ions      │ │   import/   │ │   schema  │ │ • Records │ │
 │  │   tables    │ │   sessions  │ │ • Refresh   │ │   export    │ │ • Natural │ │ • Career  │ │
@@ -34,8 +34,8 @@ Inspired by [From JSON to GOAT](https://tpeplow.substack.com/p/from-json-to-goat
           │               │               │               │              │             │
           ▼               ▼               ▼               ▼              ▼             ▼
     ┌──────────────────────────────────────────────────────────────────────────────────────┐
-    │                            OneLake (CricketLakehouse)                                 │
-    │         players | matches | innings | deliveries | player_enrichment                   │
+    │                            OneLake (CricketLakehouse)                                │
+    │         players | matches | innings | deliveries | player_enrichment                 │
     └──────────────────────────────────────────────────────────────────────────────────────┘
 ```
 

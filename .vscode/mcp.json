@@ -33,6 +33,7 @@
 			"type": "stdio",
 			"command": "npx",
 			"args": [
+				"-y",
 				"tsx",
 				"../cricket-mcp/src/index.ts",
 				"serve",
@@ -42,7 +43,11 @@
 				"${env:FABRIC_WORKSPACE_ID}",
 				"--lakehouse-id",
 				"${env:FABRIC_LAKEHOUSE_ID}"
-			]
+			],
+			"env": {
+				"FABRIC_WORKSPACE_ID": "4995b8e1-65cc-46f6-b456-644a46e082d5",
+				"FABRIC_LAKEHOUSE_ID": "3c76307d-170f-423b-abfc-5b52e5f01e5e"
+			}
 		}
 	},
 	"inputs": []
