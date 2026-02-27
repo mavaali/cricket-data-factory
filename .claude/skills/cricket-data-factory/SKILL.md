@@ -151,12 +151,10 @@ These affect all analytics calculations:
 
 ## Workspace Configuration
 
-Configure these for your own Fabric tenant:
+Workspace-specific IDs, URLs, and connection details are in `.claude/local-config.md` (gitignored).
+Copy `.claude/local-config.example.md` to `.claude/local-config.md` and fill in your Fabric workspace details.
 
-- **Workspace**: name of your Fabric workspace
-- **Lakehouse**: CricketLakehouse (created via Fabric MCP `onelake item create`)
-- **Notebook**: CricketETL (deployed via REST API `updateDefinition`)
-- **Semantic Model**: CricketAnalytics (DirectLake over lakehouse tables)
+**Always read `.claude/local-config.md` at the start of a session for workspace IDs, portal URLs, SQL endpoints, connection IDs, and Livy session details.**
 
 ## Key Learnings
 
