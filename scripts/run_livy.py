@@ -1,12 +1,36 @@
 #!/usr/bin/env python3
-"""Submit a code cell to the Fabric Livy session and poll for result"""
-import json, subprocess, sys, time, ssl, urllib.request
+"""Submit a code cell to the Fabric Livy session and poll for result.
+
+Required env vars (or .env file):
+  FABRIC_WORKSPACE_ID  - Fabric workspace GUID
+  FABRIC_LAKEHOUSE_ID  - Lakehouse GUID
+  FABRIC_LIVY_SESSION  - Livy session GUID
+"""
+import json, os, subprocess, sys, time, ssl, urllib.request
+from pathlib import Path
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
-WS = "4995b8e1-65cc-46f6-b456-644a46e082d5"
-LH = "3c76307d-170f-423b-abfc-5b52e5f01e5e"
-SESSION = "166a28f2-821c-4e5c-a39a-62ba5b5a2feb"
+# Load .env if present
+def load_dotenv():
+    env_path = Path(__file__).resolve().parent.parent / '.env'
+    if env_path.exists():
+        for line in env_path.read_text().splitlines():
+            line = line.strip()
+            if line and not line.startswith('#') and '=' in line:
+                k, v = line.split('=', 1)
+                os.environ.setdefault(k.strip(), v.strip())
+
+load_dotenv()
+
+WS = os.environ.get('FABRIC_WORKSPACE_ID', '')
+LH = os.environ.get('FABRIC_LAKEHOUSE_ID', '')
+SESSION = os.environ.get('FABRIC_LIVY_SESSION', '')
+
+if not all([WS, LH, SESSION]):
+    print('Error: Set FABRIC_WORKSPACE_ID, FABRIC_LAKEHOUSE_ID, FABRIC_LIVY_SESSION in .env or environment')
+    sys.exit(1)
+
 BASE = f"https://api.fabric.microsoft.com/v1/workspaces/{WS}/lakehouses/{LH}/livyApi/versions/2023-12-01/sessions/{SESSION}"
 
 def get_token():

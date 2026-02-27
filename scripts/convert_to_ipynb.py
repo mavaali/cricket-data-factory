@@ -1,8 +1,37 @@
 #!/usr/bin/env python3
-"""Convert CricketETL.py (Fabric .py format) to .ipynb"""
-import json
+"""Convert CricketETL.py (Fabric .py format) to .ipynb.
 
-with open('/Users/mihirwagle/projects/cricket-data-factory/notebooks/CricketETL.py', 'r') as f:
+Required env vars (or .env file):
+  FABRIC_WORKSPACE_ID  - Fabric workspace GUID
+  FABRIC_LAKEHOUSE_ID  - Lakehouse GUID
+"""
+import json, os, sys
+from pathlib import Path
+
+# Load .env if present
+def load_dotenv():
+    env_path = Path(__file__).resolve().parent.parent / '.env'
+    if env_path.exists():
+        for line in env_path.read_text().splitlines():
+            line = line.strip()
+            if line and not line.startswith('#') and '=' in line:
+                k, v = line.split('=', 1)
+                os.environ.setdefault(k.strip(), v.strip())
+
+load_dotenv()
+
+WORKSPACE_ID = os.environ.get('FABRIC_WORKSPACE_ID', '')
+LAKEHOUSE_ID = os.environ.get('FABRIC_LAKEHOUSE_ID', '')
+
+if not all([WORKSPACE_ID, LAKEHOUSE_ID]):
+    print('Error: Set FABRIC_WORKSPACE_ID, FABRIC_LAKEHOUSE_ID in .env or environment')
+    sys.exit(1)
+
+project_root = Path(__file__).resolve().parent.parent
+input_path = project_root / 'notebooks' / 'CricketETL.py'
+output_path = project_root / 'notebooks' / 'CricketETL.ipynb'
+
+with open(input_path, 'r') as f:
     content = f.read()
 
 raw_cells = content.split('# CELL ********************')
@@ -54,12 +83,12 @@ notebook = {
         'language_info': {'name': 'python'},
         'trident': {
             'lakehouse': {
-                'default_lakehouse': '3c76307d-170f-423b-abfc-5b52e5f01e5e',
+                'default_lakehouse': LAKEHOUSE_ID,
                 'default_lakehouse_name': 'CricketLakehouse',
-                'default_lakehouse_workspace_id': '4995b8e1-65cc-46f6-b456-644a46e082d5',
+                'default_lakehouse_workspace_id': WORKSPACE_ID,
                 'known_lakehouses': [
                     {
-                        'id': '3c76307d-170f-423b-abfc-5b52e5f01e5e'
+                        'id': LAKEHOUSE_ID
                     }
                 ]
             }
@@ -72,6 +101,6 @@ print(f'Cells: {len(cells)}')
 print(f'Code cells: {sum(1 for c in cells if c["cell_type"] == "code")}')
 print(f'Markdown cells: {sum(1 for c in cells if c["cell_type"] == "markdown")}')
 
-with open('/Users/mihirwagle/projects/cricket-data-factory/notebooks/CricketETL.ipynb', 'w') as f:
+with open(output_path, 'w') as f:
     json.dump(notebook, f, indent=2)
-print('Written CricketETL.ipynb')
+print(f'Written {output_path}')

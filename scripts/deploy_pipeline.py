@@ -1,13 +1,37 @@
 #!/usr/bin/env python3
-"""Deploy pipeline definition to Fabric"""
-import json, base64, subprocess, ssl, urllib.request
+"""Deploy pipeline definition to Fabric.
+
+Required env vars (or .env file):
+  FABRIC_WORKSPACE_ID  - Fabric workspace GUID
+  FABRIC_PIPELINE_ID   - Pipeline item GUID
+  FABRIC_NOTEBOOK_ID   - Notebook item GUID
+  FABRIC_DATAFLOW_ID   - Dataflow item GUID
+"""
+import json, base64, os, subprocess, ssl, sys, urllib.request
+from pathlib import Path
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
-WS = "4995b8e1-65cc-46f6-b456-644a46e082d5"
-PIPELINE_ID = "7fbc8e79-9a5b-4e59-ba00-200f96d34062"
-NOTEBOOK_ID = "8afec919-e692-4099-adc0-a019fa0d581f"
-DATAFLOW_ID = "28e9ae1c-26ad-4d1a-9072-ceb97c166943"
+# Load .env if present
+def load_dotenv():
+    env_path = Path(__file__).resolve().parent.parent / '.env'
+    if env_path.exists():
+        for line in env_path.read_text().splitlines():
+            line = line.strip()
+            if line and not line.startswith('#') and '=' in line:
+                k, v = line.split('=', 1)
+                os.environ.setdefault(k.strip(), v.strip())
+
+load_dotenv()
+
+WS = os.environ.get('FABRIC_WORKSPACE_ID', '')
+PIPELINE_ID = os.environ.get('FABRIC_PIPELINE_ID', '')
+NOTEBOOK_ID = os.environ.get('FABRIC_NOTEBOOK_ID', '')
+DATAFLOW_ID = os.environ.get('FABRIC_DATAFLOW_ID', '')
+
+if not all([WS, PIPELINE_ID, NOTEBOOK_ID, DATAFLOW_ID]):
+    print('Error: Set FABRIC_WORKSPACE_ID, FABRIC_PIPELINE_ID, FABRIC_NOTEBOOK_ID, FABRIC_DATAFLOW_ID in .env or environment')
+    sys.exit(1)
 
 # Get token
 r = subprocess.run(['az', 'account', 'get-access-token', '--resource', 'https://api.fabric.microsoft.com', '--query', 'accessToken', '-o', 'tsv'], capture_output=True, text=True)

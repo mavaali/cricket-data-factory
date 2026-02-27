@@ -1,13 +1,35 @@
 #!/usr/bin/env python3
-"""Deploy CricketAnalytics semantic model to Fabric via REST API"""
-import json, base64, subprocess, ssl, urllib.request
+"""Deploy CricketAnalytics semantic model to Fabric via REST API.
+
+Required env vars (or .env file):
+  FABRIC_WORKSPACE_ID     - Fabric workspace GUID
+  FABRIC_SQL_ENDPOINT     - Lakehouse SQL endpoint hostname
+  FABRIC_SQL_ENDPOINT_ID  - SQL endpoint GUID
+"""
+import json, base64, os, subprocess, ssl, sys, urllib.request
+from pathlib import Path
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
-WS = "4995b8e1-65cc-46f6-b456-644a46e082d5"
-LH_ID = "3c76307d-170f-423b-abfc-5b52e5f01e5e"
-SQL_ENDPOINT = "x6eps4xrq2xudenlfv6naeo3i4-4g4jksommx3enncwmrfenyec2u.msit-datawarehouse.fabric.microsoft.com"
-SQL_ENDPOINT_ID = "de25306a-4f93-4284-9cb6-147bc4e5c7ef"
+# Load .env if present
+def load_dotenv():
+    env_path = Path(__file__).resolve().parent.parent / '.env'
+    if env_path.exists():
+        for line in env_path.read_text().splitlines():
+            line = line.strip()
+            if line and not line.startswith('#') and '=' in line:
+                k, v = line.split('=', 1)
+                os.environ.setdefault(k.strip(), v.strip())
+
+load_dotenv()
+
+WS = os.environ.get('FABRIC_WORKSPACE_ID', '')
+SQL_ENDPOINT = os.environ.get('FABRIC_SQL_ENDPOINT', '')
+SQL_ENDPOINT_ID = os.environ.get('FABRIC_SQL_ENDPOINT_ID', '')
+
+if not all([WS, SQL_ENDPOINT, SQL_ENDPOINT_ID]):
+    print('Error: Set FABRIC_WORKSPACE_ID, FABRIC_SQL_ENDPOINT, FABRIC_SQL_ENDPOINT_ID in .env or environment')
+    sys.exit(1)
 
 def get_token():
     r = subprocess.run(['az', 'account', 'get-access-token', '--resource', 'https://api.fabric.microsoft.com', '--query', 'accessToken', '-o', 'tsv'], capture_output=True, text=True)
