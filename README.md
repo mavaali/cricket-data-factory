@@ -1,12 +1,12 @@
 # Cricket Data Factory
 
-Build a cricket analytics pipeline in Microsoft Fabric using four MCP servers — from raw JSON to enterprise dashboards, entirely from VS Code.
+Build a cricket analytics pipeline in Microsoft Fabric using six MCP servers — from raw JSON to enterprise dashboards, entirely from VS Code.
 
 ## What This Is
 
 [cricket-mcp](https://github.com/mavaali/cricket-mcp) is an MCP server that gives AI agents access to 10.9 million ball-by-ball cricket deliveries from [Cricsheet](https://cricsheet.org/). It runs locally on DuckDB with 26 analytical tools — matchups, phase stats, career analysis, tournament leaderboards, and more.
 
-This project extends cricket-mcp into Microsoft Fabric for enterprise use: shared Power BI dashboards, governed data access, scheduled refreshes, and team collaboration. Four MCP servers work together in a single VS Code session — zero portal clicks.
+This project extends cricket-mcp into Microsoft Fabric for enterprise use: shared Power BI dashboards, governed data access, scheduled refreshes, and team collaboration. Six MCP servers work together in a single VS Code session — zero portal clicks.
 
 Inspired by [From JSON to GOAT](https://tpeplow.substack.com/p/from-json-to-goat-building-a-cricket) by Tom Peplow.
 
