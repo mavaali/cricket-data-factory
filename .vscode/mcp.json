@@ -1,0 +1,49 @@
+{
+	"servers": {
+		"powerbi-remote": {
+			"type": "http",
+			"url": "https://api.fabric.microsoft.com/v1/mcp/powerbi"
+		},
+		"DataFactory.MCP": {
+			"type": "stdio",
+			"command": "dnx",
+			"args": [
+				"Microsoft.DataFactory.MCP@0.16.0-beta",
+				"--yes",
+				"--",
+				"mcp",
+				"start",
+				"--",
+				"--pipeline",
+				"--dataflow-query"
+			]
+		},
+		"fabric-analytics": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"mcp-for-microsoft-fabric-analytics"
+			],
+			"env": {
+				"FABRIC_AUTH_METHOD": "azure_cli"
+			}
+		},
+		"cricket-mcp": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"tsx",
+				"/Users/mihirwagle/projects/cricket-mcp/src/index.ts",
+				"serve",
+				"--backend",
+				"onelake",
+				"--workspace-id",
+				"4995b8e1-65cc-46f6-b456-644a46e082d5",
+				"--lakehouse-id",
+				"3c76307d-170f-423b-abfc-5b52e5f01e5e"
+			]
+		}
+	},
+	"inputs": []
+}

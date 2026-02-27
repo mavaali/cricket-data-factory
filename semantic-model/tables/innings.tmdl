@@ -1,0 +1,39 @@
+/// Innings dimension — 47K innings
+table innings
+
+  column match_id
+    dataType: string
+    sourceColumn: match_id
+
+  column innings_number
+    dataType: int64
+    sourceColumn: innings_number
+
+  column batting_team
+    dataType: string
+    sourceColumn: batting_team
+
+  column bowling_team
+    dataType: string
+    sourceColumn: bowling_team
+
+  column target_runs
+    dataType: int64
+    sourceColumn: target_runs
+
+  column declared
+    dataType: boolean
+    sourceColumn: declared
+
+  column forfeited
+    dataType: boolean
+    sourceColumn: forfeited
+
+  column is_super_over
+    dataType: boolean
+    sourceColumn: is_super_over
+
+  partition innings = entity
+    mode: directLake
+    entityName: innings
+    schemaName: dbo

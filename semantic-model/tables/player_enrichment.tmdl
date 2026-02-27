@@ -1,0 +1,43 @@
+/// Player enrichment — 16K player profiles from ESPNCricinfo via cricketdata R package
+table player_enrichment
+
+  column cricinfo_id
+    dataType: string
+    sourceColumn: cricinfo_id
+
+  column cricsheet_id
+    dataType: string
+    sourceColumn: cricsheet_id
+
+  column unique_name
+    dataType: string
+    sourceColumn: unique_name
+
+  column full_name
+    dataType: string
+    sourceColumn: full_name
+
+  column country
+    dataType: string
+    sourceColumn: country
+
+  column dob
+    dataType: string
+    sourceColumn: dob
+
+  column batting_style
+    dataType: string
+    sourceColumn: batting_style
+
+  column bowling_style
+    dataType: string
+    sourceColumn: bowling_style
+
+  column playing_role
+    dataType: string
+    sourceColumn: playing_role
+
+  partition player_enrichment = entity
+    mode: directLake
+    entityName: player_enrichment
+    schemaName: dbo

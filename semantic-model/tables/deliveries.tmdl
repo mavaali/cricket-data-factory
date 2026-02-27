@@ -1,0 +1,141 @@
+/// Deliveries fact table — 10.9M rows, one per ball bowled
+table deliveries
+
+  measure 'Total Runs' = SUM(deliveries[runs_total])
+    formatString: #,##0
+
+  measure 'Batter Runs' = SUM(deliveries[runs_batter])
+    formatString: #,##0
+
+  measure 'Balls Faced' = COUNTROWS(FILTER(deliveries, deliveries[extras_wides] = 0))
+    formatString: #,##0
+
+  measure 'Strike Rate' = DIVIDE([Batter Runs], [Balls Faced], 0) * 100
+    formatString: #,##0.00
+
+  measure 'Dismissals' = COUNTROWS(FILTER(deliveries, deliveries[is_wicket] = TRUE() && NOT(deliveries[wicket_kind] IN {"retired hurt", "retired not out", "retired out"})))
+    formatString: #,##0
+
+  measure 'Batting Average' = DIVIDE([Batter Runs], [Dismissals], 0)
+    formatString: #,##0.00
+
+  measure 'Wickets' = COUNTROWS(FILTER(deliveries, deliveries[is_wicket] = TRUE() && NOT(deliveries[wicket_kind] IN {"run out", "retired hurt", "retired not out", "retired out", "obstructing the field", "handled the ball", "hit the ball twice"})))
+    formatString: #,##0
+
+  measure 'Bowler Runs' = SUMX(deliveries, deliveries[runs_total] - deliveries[extras_byes] - deliveries[extras_legbyes])
+    formatString: #,##0
+
+  measure 'Legal Deliveries' = COUNTROWS(FILTER(deliveries, deliveries[extras_wides] = 0 && deliveries[extras_noballs] = 0))
+    formatString: #,##0
+
+  measure 'Economy Rate' = DIVIDE([Bowler Runs], [Legal Deliveries], 0) * 6
+    formatString: #,##0.00
+
+  measure 'Bowling Average' = DIVIDE([Bowler Runs], [Wickets], 0)
+    formatString: #,##0.00
+
+  measure 'Bowling Strike Rate' = DIVIDE([Legal Deliveries], [Wickets], 0)
+    formatString: #,##0.00
+
+  measure 'Dot Ball %' = DIVIDE(COUNTROWS(FILTER(deliveries, deliveries[runs_total] = 0)), COUNTROWS(deliveries), 0) * 100
+    formatString: #,##0.0
+
+  measure 'Boundary %' = DIVIDE(COUNTROWS(FILTER(deliveries, deliveries[runs_batter] IN {4, 6} && deliveries[runs_non_boundary] = FALSE())), [Balls Faced], 0) * 100
+    formatString: #,##0.0
+
+  column match_id
+    dataType: string
+    sourceColumn: match_id
+
+  column innings_number
+    dataType: int64
+    sourceColumn: innings_number
+
+  column over_number
+    dataType: int64
+    sourceColumn: over_number
+
+  column ball_number
+    dataType: int64
+    sourceColumn: ball_number
+
+  column batter
+    dataType: string
+    sourceColumn: batter
+
+  column batter_id
+    dataType: string
+    sourceColumn: batter_id
+
+  column bowler
+    dataType: string
+    sourceColumn: bowler
+
+  column bowler_id
+    dataType: string
+    sourceColumn: bowler_id
+
+  column non_striker
+    dataType: string
+    sourceColumn: non_striker
+
+  column runs_batter
+    dataType: int64
+    sourceColumn: runs_batter
+
+  column runs_extras
+    dataType: int64
+    sourceColumn: runs_extras
+
+  column runs_total
+    dataType: int64
+    sourceColumn: runs_total
+
+  column runs_non_boundary
+    dataType: boolean
+    sourceColumn: runs_non_boundary
+
+  column extras_wides
+    dataType: int64
+    sourceColumn: extras_wides
+
+  column extras_noballs
+    dataType: int64
+    sourceColumn: extras_noballs
+
+  column extras_byes
+    dataType: int64
+    sourceColumn: extras_byes
+
+  column extras_legbyes
+    dataType: int64
+    sourceColumn: extras_legbyes
+
+  column is_wicket
+    dataType: boolean
+    sourceColumn: is_wicket
+
+  column wicket_kind
+    dataType: string
+    sourceColumn: wicket_kind
+
+  column wicket_player_out
+    dataType: string
+    sourceColumn: wicket_player_out
+
+  column wicket_fielder1
+    dataType: string
+    sourceColumn: wicket_fielder1
+
+  column batting_team
+    dataType: string
+    sourceColumn: batting_team
+
+  column bowling_team
+    dataType: string
+    sourceColumn: bowling_team
+
+  partition deliveries = entity
+    mode: directLake
+    entityName: deliveries
+    schemaName: dbo

@@ -1,0 +1,16 @@
+# Generated files
+notebooks/*.ipynb
+/tmp/
+
+# OS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+
+# Secrets
+.env

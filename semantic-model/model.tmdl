@@ -1,0 +1,23 @@
+model Model
+  culture: en-US
+  defaultPowerBIDataSourceVersion: powerBI_V3
+  sourceQueryCulture: en-US
+
+  annotation PBI_QueryOrder = ["deliveries","matches","innings","players","player_enrichment"]
+
+relationship deliveries_to_matches
+  fromColumn: deliveries.match_id
+  toColumn: matches.match_id
+
+relationship deliveries_batter_to_players
+  fromColumn: deliveries.batter_id
+  toColumn: players.player_id
+
+relationship deliveries_bowler_to_players
+  fromColumn: deliveries.bowler_id
+  toColumn: players.player_id
+  isActive: false
+
+relationship players_to_enrichment
+  fromColumn: players.player_id
+  toColumn: player_enrichment.cricsheet_id

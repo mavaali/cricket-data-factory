@@ -1,0 +1,67 @@
+/// Match dimension — 21K matches
+table matches
+
+  column match_id
+    dataType: string
+    sourceColumn: match_id
+
+  column match_type
+    dataType: string
+    sourceColumn: match_type
+
+  column gender
+    dataType: string
+    sourceColumn: gender
+
+  column team_type
+    dataType: string
+    sourceColumn: team_type
+
+  column venue
+    dataType: string
+    sourceColumn: venue
+
+  column city
+    dataType: string
+    sourceColumn: city
+
+  column date_start
+    dataType: string
+    sourceColumn: date_start
+
+  column team1
+    dataType: string
+    sourceColumn: team1
+
+  column team2
+    dataType: string
+    sourceColumn: team2
+
+  column toss_winner
+    dataType: string
+    sourceColumn: toss_winner
+
+  column toss_decision
+    dataType: string
+    sourceColumn: toss_decision
+
+  column outcome_winner
+    dataType: string
+    sourceColumn: outcome_winner
+
+  column outcome_result
+    dataType: string
+    sourceColumn: outcome_result
+
+  column event_name
+    dataType: string
+    sourceColumn: event_name
+
+  column season
+    dataType: string
+    sourceColumn: season
+
+  partition matches = entity
+    mode: directLake
+    entityName: matches
+    schemaName: dbo

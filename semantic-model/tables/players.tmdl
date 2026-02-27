@@ -1,0 +1,31 @@
+/// Player dimension — 14K players from Cricsheet registry
+table players
+
+  column player_id
+    dataType: string
+    sourceColumn: player_id
+
+  column player_name
+    dataType: string
+    sourceColumn: player_name
+
+  column batting_style
+    dataType: string
+    sourceColumn: batting_style
+
+  column bowling_style
+    dataType: string
+    sourceColumn: bowling_style
+
+  column playing_role
+    dataType: string
+    sourceColumn: playing_role
+
+  column country
+    dataType: string
+    sourceColumn: country
+
+  partition players = entity
+    mode: directLake
+    entityName: players
+    schemaName: dbo
