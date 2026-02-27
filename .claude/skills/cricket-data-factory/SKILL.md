@@ -163,6 +163,36 @@ These affect all analytics calculations:
 - **SQL Endpoint ID**: `de25306a-4f93-4284-9cb6-147bc4e5c7ef`
 - **Semantic Model**: CricketAnalytics (`c4996ee5-8226-4afa-b895-f9d0a1feffe8`)
 
+## Session Context (Feb 26, 2026)
+
+### What was built in this session
+1. Created CricketLakehouse via Fabric MCP `onelake item create`
+2. Built PySpark ETL notebook (`notebooks/CricketETL.py`) — downloads 94MB Cricsheet ZIP, parses 21K JSON files, writes 4 Delta tables
+3. Deployed notebook via Fabric REST API `updateDefinition` (base64 ipynb)
+4. Executed ETL via Fabric Livy API (`scripts/run_livy.py`) — all cells succeeded, 10.9M deliveries loaded
+5. Created PlayerEnrichment dataflow via DataFactory MCP (v4 — needed fresh dataflow + AllowCombine + correct CSV columns)
+6. Created CricketPipeline via Fabric REST API (Notebook → Dataflow)
+7. Deployed CricketAnalytics DirectLake semantic model via REST API (model.bim + definition.pbism)
+8. Added OneLake backend to cricket-mcp (`src/backends/onelake.ts`) — DuckDB delta+azure extensions reading from OneLake
+9. cricket-mcp confirmed working on OneLake — all 26 tools operational
+10. Pushed to https://github.com/mavaali/cricket-data-factory
+
+### Key learnings encoded
+- **Fabric Jobs API** returns "failed without detail error" — always use **Livy API** for notebook execution
+- **DataFactory MCP NuGet version**: use `Microsoft.DataFactory.MCP@0.16.0-beta` (not `latest`)
+- **DataFactory MCP feature flags**: `--pipeline` and `--dataflow-query` enable pipeline and query tools
+- **Dataflow AllowCombine**: required for multi-source (Web + Lakehouse), must be on fresh dataflow
+- **Player CSV columns**: `cricinfo_id` (NOT `espn_id`), `cricsheet_id`, `unique_name`, `full_name`, `name`, `country`, `dob`, `batting_style`, `bowling_style`, `birthplace`, `playing_role`
+- **DirectLake model.bim**: needs `definition.pbism` alongside, `compatibilityLevel: 1604`, `expressionSource` referencing `Sql.Database()` expression
+- **Power BI Modeling MCP on macOS**: needs `codesign -s -` to ad-hoc sign the unsigned binary
+- **Architecture diagram in README** still shows 4 boxes — needs updating to 6
+
+### Remaining TODO
+- Update ASCII architecture diagram in README to show all 6 MCP servers
+- Merge player_enrichment into players table (cricket-mcp `get_style_matchup` needs enrichment on players table directly)
+- Git commit/push OneLake backend changes to cricket-mcp repo
+- Switch gh auth back to mihirwagleMSFT after pushing
+
 ## Livy Session (for interactive Spark execution)
 
 - **Session ID**: `166a28f2-821c-4e5c-a39a-62ba5b5a2feb` (may need to recreate if expired)
